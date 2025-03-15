@@ -22,7 +22,7 @@ int main(void)
         printf("Please wait, this may take up to 5 min\n");
         uint64_t iterations = 0;
         uint32_t errors=0;
-        for (fint mantissa ={.u= ( (126<<23)| 0 ) }; mantissa.u< ((128<<23) | 0) ; mantissa.u+=1)
+        for (fint mantissa ={.u= ( (0<<23)| 0 ) }; mantissa.u< ((255<<23) | 2) ; mantissa.u+=1)
         {
             iterations++;
             float sw = sqrt((double)mantissa.f );
@@ -55,7 +55,7 @@ int main(void)
         printf("Please wait, this may take up to 5 min\n");
         uint64_t iterations = 0;
         uint32_t errors=0;
-        for (fint mantissa ={.u= ( (126<<23)| 0 ) }; mantissa.u< ((128<<23) | 0) ; mantissa.u+=1)
+        for (fint mantissa ={.u= ( (0<<23)| 0 ) }; mantissa.u< ((255<<23) | 2) ; mantissa.u+=1)
         {
             iterations++;
             float sw = 1.0/sqrt((double)mantissa.f );

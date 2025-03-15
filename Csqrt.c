@@ -126,61 +126,66 @@ float custom_sqrtf(float x)
         uint32_t i;
     } xu;
     xu.f = x;
-    uint32_t mantissa32 = xu.i & ((1 << 23) - 1); 
-    uint32_t raw_exponent = xu.i & (255 << 23);
-    uint32_t sign = xu.i & (1u << 31);
+    int32_t exponent= (int32_t )xu.i >>23;
     // check if exponent is 0
-    if (likely(raw_exponent != 0) )
+    if (likely(exponent>0) )
     {
-        if (unlikely(  sign || (xu.i > (255 << 23)) ) ) //check if negative or NaN
+        if (unlikely( exponent==255 ) ) //check if negative or NaN
         {
             // Expected behavior:
             // sqrt(-f)=+qNaN, sqrt(-NaN)=+qNaN,sqrt(-Inf)=+qNaN
-            xu.i = QUIET_NAN;
+            xu.i = (xu.i == INF) ? INF : QUIET_NAN;
             return xu.f;
-        }
-        else if (unlikely(raw_exponent == (255  << 23) ) ) // check for +Inf
+        } else 
         {
-            xu.i = INF;
-            return xu.f; // return Inf
-        } else {
-            int32_t exponent = raw_exponent - (127 << 23);
-            // subtract bias from exponent
-            exponent >>= 24;
+            uint32_t mantissa = xu.i &~ ((uint32_t)exponent << 23);
+            exponent = exponent - (127);
+            mantissa += 1 << 23; // adds implicit bit to mantissa.
+            mantissa <<= (exponent & 1);
+
+            exponent >>= 1;
             // This is meant to be a floor division
             // meaning -1/2= -0.5 should map to -1
-            // if your compiler does logical shifts instead of arithmetic
-            // use a division by 2.
-            // arithmetic shift and division have different rounding behavior
-            // but in this case it doesnt matter
             exponent = (exponent + (126 ));
-            // add bias again and bitmask the exponent
-            mantissa32 += 1 << 23; // adds implicit bit to mantissa.
-            mantissa32 <<= ((xu.i & (1 << 23)) == 0);
-            uint32_t new_mantissa=mantissa_sqrt(mantissa32);
+
+            uint32_t new_mantissa=mantissa_sqrt(mantissa);
             xu.i = (exponent<<23) + new_mantissa;
             return xu.f;
         }
     }
     else
     {
-        if (unlikely(mantissa32==0))  {
-            xu.i = sign;
-            return xu.f; // returns +0 or -0 as appropriate
-        } else if (unlikely(sign)){
-            xu.i=QUIET_NAN;
-            return xu.f;
-        }
-        int32_t shift=__builtin_clz(mantissa32)- (31-23);
-        mantissa32<<=shift; // normalize subnormal
-        int32_t exponent =  - (126)-shift;
-        mantissa32 <<= (exponent & 1);
-        uint32_t new_mantissa=mantissa_sqrt(mantissa32); 
+        if (likely(exponent == 0))  
+        {   
+            if (likely (xu.i !=0) )
+            {
 
-        exponent >>= 1;
-        exponent = (exponent + (126));
-        xu.i = (exponent<<23) + new_mantissa;
-        return xu.f;
+                uint32_t mantissa = xu.i &~ ((uint32_t)exponent << 23);
+                int32_t shift=__builtin_clz(mantissa)- (31-23);
+                mantissa<<=shift; // normalize subnormal
+                int32_t exponent =  - (126)-shift;
+                mantissa <<= (exponent & 1);
+                uint32_t new_mantissa=mantissa_sqrt(mantissa); 
+
+                exponent >>= 1;
+                exponent = (exponent + (126));
+                xu.i = (exponent<<23) + new_mantissa;
+                return xu.f;            
+            } else //sqrt(+0)=+0
+            {
+                xu.i = 0; 
+                return xu.f;
+            }
+
+        } else if (xu.i == (1u<<31))
+        {
+            xu.i= (1u<<31); //sqrt(-0)=-0
+            return xu.f;             
+        } else {
+            xu.i=QUIET_NAN;  //sqrt(negative)=qNaN
+            return xu.f;        
+        }
+
     }
 }
 
