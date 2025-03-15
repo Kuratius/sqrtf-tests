@@ -26,7 +26,7 @@
 
 uint32_t mantissa_sqrt_asm(uint32_t x);
 uint32_t mantissa_rsqrt_asm(uint32_t x);
-uint32_t sqrt_core_asm(uint32_t x);
+uint32_t sqrt_core_asm(uint32_t x, uint32_t y);
 
 
 //#define __ARM_ARCH_5TE__
@@ -107,9 +107,9 @@ inline uint32_t mantissa_rsqrt(uint32_t x)
     return mantissa_rsqrt_asm(x);
 }
 
-inline uint32_t sqrt_core(uint32_t x)
+inline uint32_t sqrt_core(uint32_t x, uint32_t y)
 {
-    return sqrt_core_asm(x);
+    return sqrt_core_asm(x,y);
 }
 
 #endif
