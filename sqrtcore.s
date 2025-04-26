@@ -19,9 +19,9 @@
 .arm
 .text
 .balign 4
-.global mantissa_sqrt_asm
-.type    mantissa_sqrt_asm, %function
-mantissa_sqrt_asm:
+.global __mantissa_sqrt_asm
+.type    __mantissa_sqrt_asm, %function
+__mantissa_sqrt_asm:
     lsl    r1, r0, #7
     mov    r3, r0
     lsls   r0, r0, #7      
@@ -46,9 +46,9 @@ mantissa_sqrt_asm:
 
 .arm
 .balign    4
-.global mantissa_rsqrt_asm
-.type    mantissa_rsqrt_asm, %function
-mantissa_rsqrt_asm:
+.global __mantissa_rsqrt_asm
+.type    __mantissa_rsqrt_asm, %function
+__mantissa_rsqrt_asm:
     mov    r1, #1073741824
     mov    r3, r0 
     lsls   r0, r0, #7      

@@ -19,13 +19,13 @@
 
 .text
 .balign 4
-.global mantissa_sqrt_asm
-.type    mantissa_sqrt_asm, %function
-mantissa_sqrt_asm:
+.global __mantissa_sqrt_asm
+.type    __mantissa_sqrt_asm, %function
+__mantissa_sqrt_asm:
     lsl    r1, r0, #7
     mov    r3, r0
     mov    r12, lr
-    bl     sqrt_core_asm
+    bl     __sqrt_core_asm
     lsr    r0, r0, #8
     lsl    r1, r3, #23
     umull  lr, r2, r0, r0
@@ -40,9 +40,9 @@ mantissa_sqrt_asm:
 .arm
 .text
 .balign 4
-.global sqrt_core_asm
-.type   sqrt_core_asm, %function
-sqrt_core_asm: 
+.global __sqrt_core_asm
+.type   __sqrt_core_asm, %function
+__sqrt_core_asm: 
     //calculates rsqrt of 9.23 fixed point number in the range [1,4)
     lsls r0, r0, #7      
     .irp x,1,2,3,4,5,6,7,8,9,10,11,12,13 //seems to be enough
@@ -58,13 +58,13 @@ sqrt_core_asm:
 
 .arm
 .balign    4
-.global mantissa_rsqrt_asm
-.type   mantissa_rsqrt_asm, %function
-mantissa_rsqrt_asm:
+.global __mantissa_rsqrt_asm
+.type   __mantissa_rsqrt_asm, %function
+__mantissa_rsqrt_asm:
     mov    r12, lr
     mov    r1, #1073741824
     mov    r3, r0 
-    bl     sqrt_core_asm
+    bl     __sqrt_core_asm
     lsr    r1, r0, #6
     orr    r1, r1, #1
     umull  r0, lr, r1, r1

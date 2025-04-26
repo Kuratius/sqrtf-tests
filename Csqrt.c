@@ -22,11 +22,9 @@
 # define likely(x) __builtin_expect (!!(x), 1)
 # define unlikely(x) __builtin_expect ((x), 0)
 
-static uint32_t mantissa_sqrt_asm(uint32_t x);
-static uint32_t mantissa_rsqrt_asm(uint32_t x);
-static uint32_t sqrt_core_asm(uint32_t x, uint32_t y);
+uint32_t __mantissa_sqrt_asm(uint32_t x);
+uint32_t __mantissa_rsqrt_asm(uint32_t x);
 
-//#define __ARM_ARCH_5TE__
 #if  !defined( __ARM_ARCH_5TE__) || defined(__OPTIMIZE_SIZE__)
 static uint32_t sqrt_core(uint32_t x, uint32_t y)
 {
@@ -95,19 +93,13 @@ static uint32_t mantissa_rsqrt(uint32_t x)
 #else
 static inline uint32_t mantissa_sqrt(uint32_t x)
 {
-    return mantissa_sqrt_asm(x);
+    return __mantissa_sqrt_asm(x);
 }
 
 static inline uint32_t mantissa_rsqrt(uint32_t x)
 {
-    return mantissa_rsqrt_asm(x);
+    return __mantissa_rsqrt_asm(x);
 }
-
-static inline uint32_t sqrt_core(uint32_t x, uint32_t y)
-{
-    return sqrt_core_asm(x,y);
-}
-
 #endif
 
 float custom_sqrtf(float x)
