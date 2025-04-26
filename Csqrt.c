@@ -14,12 +14,10 @@
 //along with this program; if not, write to the Free Software Foundation,
 //Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-
 #include <stdint.h>
 #define QUIET_NAN ((255 << 23) | ((1 << 22) | 1))
 #define INF (0xFF << 23)
 #define NEGATIVE_INF (1u<<31)|(0xFF << 23)
-
 
 # define likely(x) __builtin_expect (!!(x), 1)
 # define unlikely(x) __builtin_expect ((x), 0)
@@ -27,7 +25,6 @@
 uint32_t mantissa_sqrt_asm(uint32_t x);
 uint32_t mantissa_rsqrt_asm(uint32_t x);
 uint32_t sqrt_core_asm(uint32_t x, uint32_t y);
-
 
 //#define __ARM_ARCH_5TE__
 #ifndef __ARM_ARCH_5TE__
@@ -42,7 +39,9 @@ uint32_t sqrt_core(uint32_t x, uint32_t y)
             y+=y>>1;
         }
     }
+    #ifndef __OPTIMIZE_SIZE__
     #pragma GCC unroll 12 
+    #endif
     for (uint32_t i =2; i<14; i+=1){
         uint32_t t=x+(x>>i);
         t+=t>>i;
@@ -55,7 +54,6 @@ uint32_t sqrt_core(uint32_t x, uint32_t y)
     y+=y>>1; //this can overflow
     return ((y)-(hi) ); //but then this underflows so they cancel
 }
-
 
 uint32_t mantissa_sqrt(uint32_t x)
 {
@@ -113,10 +111,6 @@ inline uint32_t sqrt_core(uint32_t x, uint32_t y)
 }
 
 #endif
-
-
-
-
 
 float custom_sqrtf(float x)
 {
