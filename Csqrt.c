@@ -22,13 +22,13 @@
 # define likely(x) __builtin_expect (!!(x), 1)
 # define unlikely(x) __builtin_expect ((x), 0)
 
-uint32_t mantissa_sqrt_asm(uint32_t x);
-uint32_t mantissa_rsqrt_asm(uint32_t x);
-uint32_t sqrt_core_asm(uint32_t x, uint32_t y);
+static uint32_t mantissa_sqrt_asm(uint32_t x);
+static uint32_t mantissa_rsqrt_asm(uint32_t x);
+static uint32_t sqrt_core_asm(uint32_t x, uint32_t y);
 
 //#define __ARM_ARCH_5TE__
-#ifndef __ARM_ARCH_5TE__
-uint32_t sqrt_core(uint32_t x, uint32_t y)
+#if  !defined( __ARM_ARCH_5TE__) || defined(__OPTIMIZE_SIZE__)
+static uint32_t sqrt_core(uint32_t x, uint32_t y)
 {
     x<<=6;
     uint32_t t=x+(x>>1);
@@ -55,7 +55,7 @@ uint32_t sqrt_core(uint32_t x, uint32_t y)
     return ((y)-(hi) ); //but then this underflows so they cancel
 }
 
-uint32_t mantissa_sqrt(uint32_t x)
+static uint32_t mantissa_sqrt(uint32_t x)
 {
     uint32_t new_mantissa=sqrt_core(x,x<<7 )>>8;
     //we could stop here but we want infinitely precise rounding
@@ -70,7 +70,7 @@ uint32_t mantissa_sqrt(uint32_t x)
     return new_mantissa; 
 }
 
-uint32_t mantissa_rsqrt(uint32_t x)
+static uint32_t mantissa_rsqrt(uint32_t x)
 {
     uint32_t Y=x;
     uint32_t U=sqrt_core(x,1u<<30 )>>6;
@@ -92,20 +92,18 @@ uint32_t mantissa_rsqrt(uint32_t x)
        return (U+1)>>1;
     }
 }
-#endif
-
-#ifdef __ARM_ARCH_5TE__
-inline uint32_t mantissa_sqrt(uint32_t x)
+#else
+static inline uint32_t mantissa_sqrt(uint32_t x)
 {
     return mantissa_sqrt_asm(x);
 }
 
-inline uint32_t mantissa_rsqrt(uint32_t x)
+static inline uint32_t mantissa_rsqrt(uint32_t x)
 {
     return mantissa_rsqrt_asm(x);
 }
 
-inline uint32_t sqrt_core(uint32_t x, uint32_t y)
+static inline uint32_t sqrt_core(uint32_t x, uint32_t y)
 {
     return sqrt_core_asm(x,y);
 }
