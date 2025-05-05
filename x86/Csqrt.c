@@ -71,8 +71,10 @@ static uint32_t mantissa_rsqrt(uint32_t x)
     return (U+1)>>1;
 #else
     U |=1;
-    uint32_t A_hi= ((uint64_t) U*U)>>32;
-    uint32_t A_lo= U*U;
+
+    uint64_t A=((uint64_t) U*U);
+    uint32_t A_hi= A>>32;
+    uint32_t A_lo= A;
     uint32_t B_hi = ((uint64_t) Y*A_lo)>>32;
     uint64_t C= (uint64_t) Y*A_hi;
     uint64_t S=B_hi+C;
