@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>
+
 #define QUIET_NAN ((255 << 23) | ((1 << 22) | 1))
 #define INF (0xFF << 23)
 #define NEGATIVE_INF (1u<<31)|(0xFF << 23)
@@ -24,7 +25,7 @@
 # define likely(x) __builtin_expect (!!(x), 1)
 # define unlikely(x) __builtin_expect ((x), 0)
 
-#define LUCKY 0
+#define LUCKY 1
 
 extern float sqrt_core(float x);
 
@@ -51,7 +52,11 @@ static uint32_t mantissa_rsqrt(uint32_t x)
     }
     //printf("Input float: %f \n", xu.f);
     double correct_result=1.0d/sqrt((double)xu.f);
+
+
     double fres=sqrt_core(xu.f);
+
+
     double nr=0.5d*fres*(3.0d-xu.f*fres*fres);
     nr=0.5d*nr*(3.0d-xu.f*nr*nr);
     union
